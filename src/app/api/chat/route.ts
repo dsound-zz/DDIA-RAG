@@ -15,6 +15,7 @@ const llm = new ChatTogetherAI({
   model: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
   temperature: 0.1,
   maxTokens: 1024,
+  togetherAIApiKey: process.env.TOGETHER_API_KEY,
 });
 
 // Define LangGraph State
