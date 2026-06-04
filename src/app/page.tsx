@@ -1,65 +1,107 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
 
 export default function Home() {
+  const [query, setQuery] = useState("");
+  const [messages, setMessages] = useState<{ role: "user" | "mentor"; content: string }[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+
+    const userMessage = { role: "user" as const, content: query };
+    setMessages((prev) => [...prev, userMessage]);
+    setQuery("");
+    setIsLoading(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userMessage.content }),
+      });
+
+      const data = await res.json();
+      
+      if (res.ok) {
+        setMessages((prev) => [...prev, { role: "mentor", content: data.reply }]);
+      } else {
+        setMessages((prev) => [...prev, { role: "mentor", content: `Error: ${data.error}` }]);
+      }
+    } catch (err) {
+      setMessages((prev) => [...prev, { role: "mentor", content: "Failed to fetch response." }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="flex flex-col h-screen bg-gray-50 text-gray-900 font-sans">
+      <header className="py-6 bg-white shadow-sm px-8 flex flex-col justify-center items-center">
+        <h1 className="text-3xl font-bold tracking-tight text-indigo-600">DDIA Data Engineering Mentor</h1>
+        <p className="text-gray-500 mt-2">Powered by Llama 3.3 70B, Together AI, and Neon pgvector</p>
+      </header>
+
+      <main className="flex-1 overflow-y-auto p-8 max-w-4xl mx-auto w-full">
+        <div className="flex flex-col gap-6">
+          {messages.length === 0 && (
+            <div className="text-center text-gray-400 mt-20">
+              <p className="text-xl">Ask me anything about Designing Data-Intensive Applications!</p>
+              <p className="text-sm mt-2">Try: "What is the difference between synchronous and asynchronous replication?"</p>
+            </div>
+          )}
+
+          {messages.map((msg, idx) => (
+            <div
+              key={idx}
+              className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+              <div
+                className={`max-w-[80%] rounded-2xl px-6 py-4 shadow-sm ${
+                  msg.role === "user"
+                    ? "bg-indigo-600 text-white"
+                    : "bg-white border border-gray-200 text-gray-800"
+                }`}
+              >
+                <div className="font-semibold text-xs mb-1 opacity-70 uppercase tracking-wider">
+                  {msg.role === "user" ? "You" : "Mentor"}
+                </div>
+                <div className="leading-relaxed whitespace-pre-wrap">{msg.content}</div>
+              </div>
+            </div>
+          ))}
+
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-white border border-gray-200 text-gray-500 rounded-2xl px-6 py-4 shadow-sm">
+                Thinking and searching DDIA...
+              </div>
+            </div>
+          )}
         </div>
       </main>
+
+      <footer className="p-6 bg-white border-t border-gray-200">
+        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto flex gap-4">
+          <input
+            type="text"
+            className="flex-1 rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Ask a data engineering question..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            disabled={isLoading}
+          />
+          <button
+            type="submit"
+            disabled={isLoading || !query.trim()}
+            className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Ask
+          </button>
+        </form>
+      </footer>
     </div>
   );
 }
