@@ -28,7 +28,8 @@ export const textChunks = pgTable("text_chunks", {
   id: uuid("id").defaultRandom().primaryKey(),
   sectionId: uuid("section_id").references(() => structuralMetadata.id, { onDelete: "cascade" }).notNull(),
   content: text("content").notNull(),
+  imageUrl: varchar("image_url", { length: 500 }),
   // Vector for BAAI/bge-large-en-v1.5 (Together AI)
-  embedding: vector("embedding", { dimensions: 1024 }), 
+  embedding: vector("embedding", { dimensions: 1024 }).notNull(), 
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

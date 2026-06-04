@@ -16,6 +16,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [toc, setToc] = useState<Section[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isReaderOpen, setIsReaderOpen] = useState(false);
+  const [readerContent, setReaderContent] = useState<{ title: string, text: string, isLoading: boolean } | null>(null);
 
   useEffect(() => {
     async function fetchToc() {
@@ -72,11 +74,28 @@ export default function Home() {
     }
   };
 
-  const handleTocClick = (summary: string) => {
+  const handleTocClick = async (section: Section) => {
+    // 1. Drop summary in chat
     setMessages((prev) => [
       ...prev,
-      { role: "mentor", content: `**Chapter Summary:**\n\n${summary}` }
+      { role: "mentor", content: `**${section.title} (Summary):**\n\n${section.summary}` }
     ]);
+
+    // 2. Open Reader and fetch full text
+    setIsReaderOpen(true);
+    setReaderContent({ title: section.title, text: "", isLoading: true });
+
+    try {
+      const res = await fetch(`/api/toc/${section.id}/text`);
+      if (res.ok) {
+        const data = await res.json();
+        setReaderContent({ title: section.title, text: data.text, isLoading: false });
+      } else {
+        setReaderContent({ title: section.title, text: "No text found for this section yet. The ingestion script may still be running.", isLoading: false });
+      }
+    } catch (err) {
+      setReaderContent({ title: section.title, text: "Failed to load full text.", isLoading: false });
+    }
   };
 
   return (
@@ -95,7 +114,7 @@ export default function Home() {
               {toc.map((section) => (
                 <li key={section.id} className="group cursor-pointer">
                   <div 
-                    onClick={() => handleTocClick(section.summary)}
+                    onClick={() => handleTocClick(section)}
                     className="p-3 rounded-lg hover:bg-indigo-50 border border-transparent hover:border-indigo-100 transition"
                   >
                     <div className="text-xs font-semibold text-indigo-400 uppercase tracking-wide mb-1">
@@ -197,6 +216,33 @@ export default function Home() {
           </form>
         </footer>
       </div>
+
+      {/* Right Slide-out Reader Panel */}
+      <aside className={`${isReaderOpen ? "w-96 border-l" : "w-0"} transition-all duration-300 ease-in-out bg-white border-gray-200 flex flex-col overflow-hidden`}>
+        <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+          <h2 className="text-sm font-bold text-gray-800 line-clamp-1 pr-4">{readerContent?.title || "Reading View"}</h2>
+          <button 
+            onClick={() => setIsReaderOpen(false)}
+            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition shrink-0"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-6 bg-white">
+          {readerContent?.isLoading ? (
+            <div className="flex justify-center items-center h-32">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+            </div>
+          ) : (
+            <div className="prose prose-sm prose-indigo max-w-none whitespace-pre-wrap text-gray-700 leading-relaxed">
+              {readerContent?.text}
+            </div>
+          )}
+        </div>
+      </aside>
+
     </div>
   );
 }
