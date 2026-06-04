@@ -4,10 +4,17 @@ import { useState, useEffect } from "react";
 
 type Section = {
   id: string;
+  parentSectionId: string | null;
   title: string;
   level: string;
   orderIndex: number;
   summary: string;
+};
+
+type ContentData = {
+  section: Section;
+  children: Section[];
+  chunks: { id: string; content: string; imageUrl: string | null }[];
 };
 
 export default function Home() {
@@ -15,9 +22,19 @@ export default function Home() {
   const [messages, setMessages] = useState<{ role: "user" | "mentor"; content: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [toc, setToc] = useState<Section[]>([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isReaderOpen, setIsReaderOpen] = useState(false);
-  const [readerContent, setReaderContent] = useState<{ title: string, text: string, isLoading: boolean } | null>(null);
+  const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
+  const [contentData, setContentData] = useState<ContentData | null>(null);
+  const [expandedTextIds, setExpandedTextIds] = useState<Set<string>>(new Set());
+
+  type TreeNodeData = Section & { childNodes: TreeNodeData[] };
+
+  // Recursively build tree
+  const buildTree = (parentId: string | null): TreeNodeData[] => {
+    return toc.filter(s => s.parentSectionId === parentId).map(s => ({
+      ...s,
+      childNodes: buildTree(s.id)
+    }));
+  };
 
   useEffect(() => {
     async function fetchToc() {
@@ -25,17 +42,7 @@ export default function Home() {
         const res = await fetch("/api/toc");
         if (res.ok) {
           const data = await res.json();
-          // Filter to avoid duplicating rows if ingestion was run multiple times for testing
-          // Group by title to remove exact duplicates for a cleaner UI
-          const uniqueSections = data.sections.reduce((acc: Section[], current: Section) => {
-            const x = acc.find(item => item.title === current.title);
-            if (!x) {
-              return acc.concat([current]);
-            } else {
-              return acc;
-            }
-          }, []);
-          setToc(uniqueSections);
+          setToc(data.sections || []);
         }
       } catch (err) {
         console.error("Failed to load ToC", err);
@@ -44,8 +51,38 @@ export default function Home() {
     fetchToc();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleTocClick = async (section: Section) => {
+    setActiveSectionId(section.id);
+    setContentData(null); // loading state
+    setExpandedTextIds(new Set()); // reset expansions
+
+    try {
+      const res = await fetch(`/api/toc/${section.id}/content`);
+      if (res.ok) {
+        const data = await res.json();
+        setContentData(data);
+      }
+    } catch (err) {
+      console.error("Failed to load content.", err);
+    }
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpandedTextIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) newSet.delete(id);
+      else newSet.add(id);
+      return newSet;
+    });
+  };
+
+  const askAiAbout = (concept: string) => {
+    setQuery(`Can you explain: ${concept}`);
+    // Focus the chat input? Let's just set the query text so they can press Enter or Ask.
+  };
+
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!query.trim()) return;
 
     const userMessage = { role: "user" as const, content: query };
@@ -74,134 +111,190 @@ export default function Home() {
     }
   };
 
-  const handleTocClick = async (section: Section) => {
-    // 1. Drop summary in chat
-    setMessages((prev) => [
-      ...prev,
-      { role: "mentor", content: `**${section.title} (Summary):**\n\n${section.summary}` }
-    ]);
-
-    // 2. Open Reader and fetch full text
-    setIsReaderOpen(true);
-    setReaderContent({ title: section.title, text: "", isLoading: true });
-
-    try {
-      const res = await fetch(`/api/toc/${section.id}/text`);
-      if (res.ok) {
-        const data = await res.json();
-        setReaderContent({ title: section.title, text: data.text, isLoading: false });
-      } else {
-        setReaderContent({ title: section.title, text: "No text found for this section yet. The ingestion script may still be running.", isLoading: false });
-      }
-    } catch (err) {
-      setReaderContent({ title: section.title, text: "Failed to load full text.", isLoading: false });
-    }
+  // Render tree node recursive component
+  const TreeNode = ({ node, depth = 0 }: { node: any, depth?: number }) => {
+    const isSelected = activeSectionId === node.id;
+    return (
+      <div className="w-full">
+        <div 
+          onClick={() => handleTocClick(node)}
+          className={`cursor-pointer px-3 py-1.5 text-sm hover:bg-gray-100 transition rounded-md border-l-2 ${isSelected ? "bg-indigo-50 border-indigo-500 font-semibold text-indigo-800" : "border-transparent text-gray-700 font-medium"}`}
+          style={{ paddingLeft: `${Math.max(0.75, depth * 1.5)}rem` }}
+        >
+          {node.title}
+        </div>
+        {node.childNodes && node.childNodes.length > 0 && (
+          <div className="flex flex-col gap-0.5 mt-0.5">
+            {node.childNodes.map((child: any) => (
+              <TreeNode key={child.id} node={child} depth={depth + 1} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
   };
 
+  const rootNodes = buildTree(null);
+
+  // Fallback flat list if tree is broken
+  const nodesToRender = rootNodes.length > 0 ? rootNodes : toc.filter(t => !t.parentSectionId);
+
   return (
-    <div className="flex h-screen bg-gray-50 text-gray-900 font-sans overflow-hidden">
+    <div className="flex h-screen bg-white text-gray-900 font-sans overflow-hidden">
       
-      {/* Sidebar (Table of Contents) */}
-      <aside className={`${isSidebarOpen ? "w-80" : "w-0"} transition-all duration-300 ease-in-out bg-white border-r border-gray-200 flex flex-col overflow-hidden`}>
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500">Table of Contents</h2>
+      {/* Pane 1: Table of Contents */}
+      <aside className="w-64 border-r border-gray-200 flex flex-col bg-gray-50 shrink-0">
+        <div className="p-4 border-b border-gray-200">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500">Table of Contents</h2>
         </div>
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-2">
           {toc.length === 0 ? (
-            <div className="text-gray-400 text-sm italic p-4 text-center">Loading contents...</div>
+            <div className="text-gray-400 text-sm italic p-2 text-center">Loading contents...</div>
           ) : (
-            <ul className="space-y-3">
-              {toc.map((section) => (
-                <li key={section.id} className="group cursor-pointer">
-                  <div 
-                    onClick={() => handleTocClick(section)}
-                    className="p-3 rounded-lg hover:bg-indigo-50 border border-transparent hover:border-indigo-100 transition"
-                  >
-                    <div className="text-xs font-semibold text-indigo-400 uppercase tracking-wide mb-1">
-                      {section.level}
-                    </div>
-                    <div className="text-sm font-medium text-gray-800 group-hover:text-indigo-700 leading-snug">
-                      {section.title}
-                    </div>
-                  </div>
-                </li>
+            <div className="flex flex-col gap-1">
+              {nodesToRender.map((node) => (
+                <TreeNode key={node.id} node={node} />
               ))}
-            </ul>
+            </div>
           )}
         </div>
       </aside>
 
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="py-5 bg-white shadow-sm px-6 flex justify-between items-center z-10">
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
-              title="Toggle Sidebar"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7" />
-              </svg>
-            </button>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-indigo-600">DDIA Mentor</h1>
-              <p className="text-xs sm:text-sm text-gray-500">Powered by Llama 3.3 70B & pgvector</p>
-            </div>
-          </div>
+      {/* Pane 2: Content Breakdown */}
+      <main className="flex-1 border-r border-gray-200 overflow-y-auto bg-white relative">
+        <header className="sticky top-0 bg-white/90 backdrop-blur-sm border-b border-gray-100 p-6 z-10">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+            {contentData?.section?.title || "Welcome to DDIA Mentor"}
+          </h1>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-8 w-full bg-gray-50">
-          <div className="flex flex-col gap-6 max-w-4xl mx-auto">
-            {messages.length === 0 && (
-              <div className="text-center text-gray-400 mt-20 px-4">
-                <p className="text-lg sm:text-xl text-gray-500 font-medium">Ask me anything about Designing Data-Intensive Applications!</p>
-                <p className="text-sm mt-3 bg-white border border-gray-200 inline-block px-4 py-2 rounded-full shadow-sm">
-                  Try: "What is the difference between synchronous and asynchronous replication?"
-                </p>
-                <p className="text-sm mt-3 bg-white border border-gray-200 inline-block px-4 py-2 rounded-full shadow-sm ml-2">
-                  Or click any section in the sidebar for a summary.
-                </p>
-              </div>
-            )}
-
-            {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[85%] rounded-2xl px-5 py-4 shadow-sm ${
-                    msg.role === "user"
-                      ? "bg-indigo-600 text-white rounded-tr-sm"
-                      : "bg-white border border-gray-200 text-gray-800 rounded-tl-sm"
-                  }`}
-                >
-                  <div className="font-semibold text-[10px] sm:text-xs mb-1 opacity-70 uppercase tracking-wider">
-                    {msg.role === "user" ? "You" : "Mentor"}
-                  </div>
-                  <div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">{msg.content}</div>
+        <div className="p-8 max-w-4xl">
+          {!contentData ? (
+            <div className="text-gray-400 text-center mt-20">Select a section from the sidebar to view concepts.</div>
+          ) : (
+            <div className="flex flex-col gap-8">
+              
+              {/* If section has children, render them as subtopics */}
+              {contentData.children.length > 0 && (
+                <div className="flex flex-col gap-6">
+                  {contentData.children.map(child => (
+                    <div key={child.id} className="p-5 border border-gray-200 rounded-xl shadow-sm bg-white hover:border-gray-300 transition">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-gray-900 mb-2">{child.title}</h3>
+                          <p className="text-gray-600 leading-relaxed text-sm">{child.summary}</p>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex gap-3">
+                        <button 
+                          onClick={() => {
+                            // Actually, fetching full text for a child requires fetching its chunks.
+                            // We can just set the active section to this child instead!
+                            handleTocClick(child);
+                          }}
+                          className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100"
+                        >
+                          View complete breakdown
+                        </button>
+                        <button 
+                          onClick={() => askAiAbout(child.title)}
+                          className="text-xs font-semibold text-gray-600 bg-gray-100 px-3 py-1.5 rounded-lg hover:bg-gray-200 flex items-center gap-1"
+                        >
+                          Ask AI about this
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
+              )}
 
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-white border border-gray-200 text-gray-500 rounded-2xl rounded-tl-sm px-6 py-4 shadow-sm text-sm flex items-center gap-3">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600"></div>
-                  Thinking and searching DDIA...
+              {/* Text Chunks and Diagrams (Rendered if this is a leaf node or has chunks) */}
+              {contentData.chunks.length > 0 && (
+                <div className="flex flex-col gap-8 mt-4">
+                  {contentData.chunks.map((chunk, idx) => (
+                    <div key={chunk.id} className="flex flex-col gap-4">
+                      {chunk.imageUrl && (
+                        <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm max-w-2xl">
+                          <img src={chunk.imageUrl} alt="Extracted diagram" className="w-full object-contain bg-gray-50" />
+                        </div>
+                      )}
+                      
+                      <div className="flex items-start gap-4">
+                        <div className="flex-1 text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">
+                          {/* If expanded, show full chunk, else show first 150 chars as summary */}
+                          {expandedTextIds.has(chunk.id) ? chunk.content : `${chunk.content.substring(0, 200).trim()}...`}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3">
+                        <button 
+                          onClick={() => toggleExpand(chunk.id)}
+                          className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+                        >
+                          {expandedTextIds.has(chunk.id) ? "Collapse text" : "Expand full text"}
+                        </button>
+                        <button 
+                          onClick={() => askAiAbout(`the concept starting with "${chunk.content.substring(0, 30)}..."`)}
+                          className="text-xs font-semibold text-gray-500 hover:text-gray-800"
+                        >
+                          Ask AI about this
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            )}
-          </div>
-        </main>
+              )}
 
-        <footer className="p-4 sm:p-6 bg-white border-t border-gray-200 z-10">
-          <form onSubmit={handleSubmit} className="max-w-4xl mx-auto flex gap-3">
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Pane 3: AI Chat */}
+      <aside className="w-96 flex flex-col shrink-0 bg-gray-50">
+        <header className="p-5 border-b border-gray-200 bg-white">
+          <h2 className="text-lg font-bold tracking-tight text-indigo-600 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+            </svg>
+            AI Chat
+          </h2>
+        </header>
+
+        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+          {messages.length === 0 && (
+            <div className="text-center text-gray-400 mt-10 px-4 text-sm">
+              I am your DDIA study companion. Click "Ask AI about this" on any concept, or just type a question below!
+            </div>
+          )}
+
+          {messages.map((msg, idx) => (
+            <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+              <div className={`max-w-[90%] rounded-2xl px-4 py-3 shadow-sm text-sm ${msg.role === "user" ? "bg-indigo-600 text-white rounded-tr-sm" : "bg-white border border-gray-200 text-gray-800 rounded-tl-sm"}`}>
+                <div className="font-bold text-[10px] mb-1 opacity-60 uppercase tracking-wider">
+                  {msg.role === "user" ? "You" : "Mentor"}
+                </div>
+                <div className="leading-relaxed whitespace-pre-wrap">{msg.content}</div>
+              </div>
+            </div>
+          ))}
+
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-white border border-gray-200 text-gray-500 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm text-sm flex items-center gap-2">
+                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-indigo-600"></div>
+                Thinking...
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="p-4 bg-white border-t border-gray-200">
+          <form onSubmit={handleSubmit} className="flex gap-2">
             <input
               type="text"
-              className="flex-1 rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm sm:text-base shadow-sm"
-              placeholder="Ask a data engineering question..."
+              className="flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+              placeholder="Ask a question..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               disabled={isLoading}
@@ -209,37 +302,11 @@ export default function Home() {
             <button
               type="submit"
               disabled={isLoading || !query.trim()}
-              className="bg-indigo-600 text-white px-6 sm:px-8 py-3 rounded-xl font-medium hover:bg-indigo-700 transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition shadow-sm disabled:opacity-50 text-sm"
             >
-              Ask
+              Send
             </button>
           </form>
-        </footer>
-      </div>
-
-      {/* Right Slide-out Reader Panel */}
-      <aside className={`${isReaderOpen ? "w-96 border-l" : "w-0"} transition-all duration-300 ease-in-out bg-white border-gray-200 flex flex-col overflow-hidden`}>
-        <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-          <h2 className="text-sm font-bold text-gray-800 line-clamp-1 pr-4">{readerContent?.title || "Reading View"}</h2>
-          <button 
-            onClick={() => setIsReaderOpen(false)}
-            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition shrink-0"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto p-6 bg-white">
-          {readerContent?.isLoading ? (
-            <div className="flex justify-center items-center h-32">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
-            </div>
-          ) : (
-            <div className="prose prose-sm prose-indigo max-w-none whitespace-pre-wrap text-gray-700 leading-relaxed">
-              {readerContent?.text}
-            </div>
-          )}
         </div>
       </aside>
 

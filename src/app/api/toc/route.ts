@@ -8,6 +8,7 @@ export async function GET() {
     const sections = await db
       .select({
         id: structuralMetadata.id,
+        parentSectionId: structuralMetadata.parentSectionId,
         title: structuralMetadata.title,
         level: structuralMetadata.level,
         orderIndex: structuralMetadata.orderIndex,

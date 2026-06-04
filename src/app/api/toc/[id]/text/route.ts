@@ -5,10 +5,11 @@ import { eq, asc } from "drizzle-orm";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const sectionId = params.id;
+    const { id } = await params;
+    const sectionId = id;
     
     // Fetch all text chunks for this section
     const chunks = await db
