@@ -1,12 +1,17 @@
 {
-  "name": "tmp-app",
+  "name": "ddia-rag",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:seed-toc": "npx tsx scripts/ddia-toc-seed.ts",
+    "db:ingest": "npx tsx scripts/ingest-structured.ts",
+    "db:generate": "npx drizzle-kit generate",
+    "db:push": "npx drizzle-kit push",
+    "test:query": "npx tsx scripts/test-query.ts"
   },
   "dependencies": {
     "@langchain/community": "^1.1.29",

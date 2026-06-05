@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { db } from "../../../../../db/index";
-import { textChunks } from "../../../../../db/schema";
+import { db } from "@/db/index";
+import { textChunks } from "@/db/schema";
 import { eq, asc } from "drizzle-orm";
 
 export async function GET(
