@@ -1,13 +1,19 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { db } from "@/db/index";
 import { savedArtifacts } from "@/db/schema";
-import { desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 export async function GET() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ artifacts: [] });
+  }
   try {
     const artifacts = await db
       .select()
       .from(savedArtifacts)
+      .where(eq(savedArtifacts.userId, session.user.id))
       .orderBy(desc(savedArtifacts.createdAt));
 
     return NextResponse.json({ artifacts });
@@ -18,6 +24,10 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
   try {
     const body = await request.json();
     const { sectionId, title, content, artifactType } = body;
@@ -29,6 +39,7 @@ export async function POST(request: Request) {
     const [inserted] = await db
       .insert(savedArtifacts)
       .values({
+        userId: session.user.id,
         sectionId: sectionId || null,
         title,
         content,

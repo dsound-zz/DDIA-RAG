@@ -1,0 +1,882 @@
+[
+  {
+    "label": "1-1",
+    "caption": "Figure 1-1. One possible architecture for a data system that combines several compo‐ nents.",
+    "page": 25,
+    "file": "/figures/fig-1-1.png",
+    "region": {
+      "yTop": 254.86356,
+      "yBottom": 546.76371
+    }
+  },
+  {
+    "label": "1-2",
+    "caption": "Figure 1-2. Simple relational schema for implementing a Twitter home timeline.",
+    "page": 32,
+    "file": "/figures/fig-1-2.png",
+    "region": {
+      "yTop": 116.86351,
+      "yBottom": 278.70786
+    }
+  },
+  {
+    "label": "1-3",
+    "caption": "Figure 1-3. Twitter’s data pipeline for delivering tweets to followers, with load parame‐ ters as of November 2012 [16].",
+    "page": 32,
+    "file": "/figures/fig-1-3.png",
+    "region": {
+      "yTop": 278.70786,
+      "yBottom": 455.15397
+    }
+  },
+  {
+    "label": "1-4",
+    "caption": "Figure 1-4. Illustrating mean and percentiles: response times for a sample of 100 requests to a service",
+    "page": 34,
+    "file": "/figures/fig-1-4.png",
+    "region": {
+      "yTop": 325.60358,
+      "yBottom": 468.15796
+    }
+  },
+  {
+    "label": "1-5",
+    "caption": "Figure 1-5. When several backend calls are needed to serve a request, it takes just a sin‐ gle slow backend request to slow down the entire end-user request.",
+    "page": 37,
+    "file": "/figures/fig-1-5.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 250.2775
+    }
+  },
+  {
+    "label": "2-1",
+    "caption": "Figure 2-1. Representing a LinkedIn profile using a relational schema.",
+    "page": 52,
+    "file": "/figures/fig-2-1.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 394.08505
+    }
+  },
+  {
+    "label": "2-2",
+    "caption": "Figure 2-2. One-to-many relationships forming a tree structure.",
+    "page": 53,
+    "file": "/figures/fig-2-2.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 304.62171
+    }
+  },
+  {
+    "label": "2-3",
+    "caption": "Figure 2-3. The company name is not just a string, but a link to a company entity.",
+    "page": 56,
+    "file": "/figures/fig-2-3.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 389.232
+    }
+  },
+  {
+    "label": "2-4",
+    "caption": "Figure 2-4. Extending résumés with many-to-many relationships.",
+    "page": 57,
+    "file": "/figures/fig-2-4.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 317.27438
+    }
+  },
+  {
+    "label": "2-5",
+    "caption": "Figure 2-5. Example of graph-structured data (boxes represent vertices, arrows repre‐ sent edges).",
+    "page": 71,
+    "file": "/figures/fig-2-5.png",
+    "region": {
+      "yTop": 185.86351,
+      "yBottom": 439.56235
+    }
+  },
+  {
+    "label": "2-6",
+    "caption": "Figure 2-6. Determining that Idaho is in North America, using the Datalog rules from Example 2-11.",
+    "page": 83,
+    "file": "/figures/fig-2-6.png",
+    "region": {
+      "yTop": 315.18252,
+      "yBottom": 471.75251
+    }
+  },
+  {
+    "label": "3-1",
+    "caption": "Figure 3-1. Storing a log of key-value pairs in a CSV-like format, indexed with an in- memory hash map.",
+    "page": 92,
+    "file": "/figures/fig-3-1.png",
+    "region": {
+      "yTop": 294.44508,
+      "yBottom": 510.56113
+    }
+  },
+  {
+    "label": "3-2",
+    "caption": "Figure 3-2. Compaction of a key-value update log (counting the number of times each cat video was played), retaining only the most recent value for each key.",
+    "page": 93,
+    "file": "/figures/fig-3-2.png",
+    "region": {
+      "yTop": 229.66354,
+      "yBottom": 401.27021
+    }
+  },
+  {
+    "label": "3-3",
+    "caption": "Figure 3-3. Performing compaction and segment merging simultaneously.",
+    "page": 94,
+    "file": "/figures/fig-3-3.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 258.48258
+    }
+  },
+  {
+    "label": "3-4",
+    "caption": "Figure 3-4. Merging several Sorted String Table (SSTable) segments, retaining only the most recent value for each key.",
+    "page": 97,
+    "file": "/figures/fig-3-4.png",
+    "region": {
+      "yTop": 142.06351,
+      "yBottom": 422.48807
+    }
+  },
+  {
+    "label": "3-5",
+    "caption": "Figure 3-5. A Sorted String Table (SSTable) with in-memory index.",
+    "page": 98,
+    "file": "/figures/fig-3-5.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 251.16744
+    }
+  },
+  {
+    "label": "3-6",
+    "caption": "Figure 3-6. Looking up a key using a B-tree index.",
+    "page": 100,
+    "file": "/figures/fig-3-6.png",
+    "region": {
+      "yTop": 260.86356,
+      "yBottom": 485.70651
+    }
+  },
+  {
+    "label": "3-7",
+    "caption": "Figure 3-7. Growing a B-tree by splitting a page.",
+    "page": 101,
+    "file": "/figures/fig-3-7.png",
+    "region": {
+      "yTop": 267.46357,
+      "yBottom": 494.98874
+    }
+  },
+  {
+    "label": "3-8",
+    "caption": "Figure 3-8. Simplified outline of ETL into a data warehouse.",
+    "page": 111,
+    "file": "/figures/fig-3-8.png",
+    "region": {
+      "yTop": 254.86356,
+      "yBottom": 533.89469
+    }
+  },
+  {
+    "label": "3-9",
+    "caption": "Figure 3-9. Example of a star schema for use in a data warehouse.",
+    "page": 114,
+    "file": "/figures/fig-3-9.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 460.05548
+    }
+  },
+  {
+    "label": "3-10",
+    "caption": "Figure 3-10. Storing relational data by column, rather than by row.",
+    "page": 116,
+    "file": "/figures/fig-3-10.png",
+    "region": {
+      "yTop": 79.0635,
+      "yBottom": 371.36838
+    }
+  },
+  {
+    "label": "3-11",
+    "caption": "Figure 3-11. Compressed, bitmap-indexed storage of a single column.",
+    "page": 117,
+    "file": "/figures/fig-3-11.png",
+    "region": {
+      "yTop": 104.26351,
+      "yBottom": 392.9108
+    }
+  },
+  {
+    "label": "3-12",
+    "caption": "Figure 3-12. Two dimensions of a data cube, aggregating data by summing.",
+    "page": 121,
+    "file": "/figures/fig-3-12.png",
+    "region": {
+      "yTop": 148.06351,
+      "yBottom": 359.49536
+    }
+  },
+  {
+    "label": "4-1",
+    "caption": "Figure 4-1. Example record (Example 4-1) encoded using MessagePack.",
+    "page": 135,
+    "file": "/figures/fig-4-1.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 373.08652
+    }
+  },
+  {
+    "label": "4-2",
+    "caption": "Figure 4-2. Example record encoded using Thrift’s BinaryProtocol.",
+    "page": 136,
+    "file": "/figures/fig-4-2.png",
+    "region": {
+      "yTop": 217.66353,
+      "yBottom": 509.56201
+    }
+  },
+  {
+    "label": "4-3",
+    "caption": "Figure 4-3. Example record encoded using Thrift’s CompactProtocol.",
+    "page": 137,
+    "file": "/figures/fig-4-3.png",
+    "region": {
+      "yTop": 280.06358,
+      "yBottom": 549.6102
+    }
+  },
+  {
+    "label": "4-4",
+    "caption": "Figure 4-4. Example record encoded using Protocol Buffers.",
+    "page": 138,
+    "file": "/figures/fig-4-4.png",
+    "region": {
+      "yTop": 149.84325,
+      "yBottom": 396.22525
+    }
+  },
+  {
+    "label": "4-5",
+    "caption": "Figure 4-5. Example record encoded using Avro.",
+    "page": 141,
+    "file": "/figures/fig-4-5.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 309.2822
+    }
+  },
+  {
+    "label": "4-6",
+    "caption": "Figure 4-6. An Avro reader resolves differences between the writer’s schema and the reader’s schema.",
+    "page": 142,
+    "file": "/figures/fig-4-6.png",
+    "region": {
+      "yTop": 267.46356,
+      "yBottom": 437.44465
+    }
+  },
+  {
+    "label": "4-7",
+    "caption": "Figure 4-7. When an older version of the application updates data previously written by a newer version of the application, data may be lost if you’re not careful.",
+    "page": 148,
+    "file": "/figures/fig-4-7.png",
+    "region": {
+      "yTop": 104.26351,
+      "yBottom": 337.97657
+    }
+  },
+  {
+    "label": "5-1",
+    "caption": "Figure 5-1. Leader-based (master-slave) replication.",
+    "page": 169,
+    "file": "/figures/fig-5-1.png",
+    "region": {
+      "yTop": 219.06353,
+      "yBottom": 363.43988
+    }
+  },
+  {
+    "label": "5-2",
+    "caption": "Figure 5-2. Leader-based replication with one synchronous and one asynchronous fol‐ lower.",
+    "page": 170,
+    "file": "/figures/fig-5-2.png",
+    "region": {
+      "yTop": 79.0635,
+      "yBottom": 260.42369
+    }
+  },
+  {
+    "label": "5-3",
+    "caption": "Figure 5-3. A user makes a write, followed by a read from a stale replica. To prevent this anomaly, we need read-after-write consistency.",
+    "page": 178,
+    "file": "/figures/fig-5-3.png",
+    "region": {
+      "yTop": 256.47255,
+      "yBottom": 437.83271
+    }
+  },
+  {
+    "label": "5-4",
+    "caption": "Figure 5-4. A user first reads from a fresh replica, then from a stale replica. Time appears to go backwards. To prevent this anomaly, we need monotonic reads.",
+    "page": 181,
+    "file": "/figures/fig-5-4.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 270.67618
+    }
+  },
+  {
+    "label": "5-5",
+    "caption": "Figure 5-5. If some partitions are replicated slower than others, an observer may see the answer before they see the question.",
+    "page": 182,
+    "file": "/figures/fig-5-5.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 314.97345
+    }
+  },
+  {
+    "label": "5-6",
+    "caption": "Figure 5-6. Multi-leader replication across multiple datacenters.",
+    "page": 184,
+    "file": "/figures/fig-5-6.png",
+    "region": {
+      "yTop": 177.3955,
+      "yBottom": 378.89987
+    }
+  },
+  {
+    "label": "5-7",
+    "caption": "Figure 5-7. A write conflict caused by two leaders concurrently updating the same record.",
+    "page": 187,
+    "file": "/figures/fig-5-7.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 272.38308
+    }
+  },
+  {
+    "label": "5-8",
+    "caption": "Figure 5-8. Three example topologies in which multi-leader replication can be set up.",
+    "page": 191,
+    "file": "/figures/fig-5-8.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 177.20319
+    }
+  },
+  {
+    "label": "5-9",
+    "caption": "Figure 5-9. With multi-leader replication, writes may arrive in the wrong order at some replicas.",
+    "page": 192,
+    "file": "/figures/fig-5-9.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 286.11927
+    }
+  },
+  {
+    "label": "5-10",
+    "caption": "Figure 5-10. A quorum write, quorum read, and read repair after a node outage.",
+    "page": 194,
+    "file": "/figures/fig-5-10.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 269.8617
+    }
+  },
+  {
+    "label": "5-11",
+    "caption": "Figure 5-11. If w + r > n, at least one of the r replicas you read from must have seen the most recent successful write.",
+    "page": 196,
+    "file": "/figures/fig-5-11.png",
+    "region": {
+      "yTop": 369.4636,
+      "yBottom": 562.60926
+    }
+  },
+  {
+    "label": "5-12",
+    "caption": "Figure 5-12. Concurrent writes in a Dynamo-style datastore: there is no well-defined ordering.",
+    "page": 201,
+    "file": "/figures/fig-5-12.png",
+    "region": {
+      "yTop": 66.4635,
+      "yBottom": 285.14826
+    }
+  },
+  {
+    "label": "5-13",
+    "caption": "Figure 5-13. Tracking causal dependencies between two clients concurrently editing a shopping cart.",
+    "page": 205,
+    "file": "/figures/fig-5-13.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 289.77685
+    }
+  },
+  {
+    "label": "5-14",
+    "caption": "Figure 5-14. Graph of causal dependencies in Figure 5-13.",
+    "page": 205,
+    "file": "/figures/fig-5-14.png",
+    "region": {
+      "yTop": 289.77685,
+      "yBottom": 415.36301
+    }
+  },
+  {
+    "label": "6-1",
+    "caption": "Figure 6-1. Combining replication and partitioning: each node acts as leader for some partitions, and follower for other partitions.",
+    "page": 215,
+    "file": "/figures/fig-6-1.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 273.35354
+    }
+  },
+  {
+    "label": "6-2",
+    "caption": "Figure 6-2. A print encyclopedia is partitioned by key range.",
+    "page": 216,
+    "file": "/figures/fig-6-2.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 204.02538
+    }
+  },
+  {
+    "label": "6-3",
+    "caption": "Figure 6-3. Partitioning by hash of key.",
+    "page": 217,
+    "file": "/figures/fig-6-3.png",
+    "region": {
+      "yTop": 312.89917,
+      "yBottom": 454.43076
+    }
+  },
+  {
+    "label": "6-4",
+    "caption": "Figure 6-4. Partitioning secondary indexes by document.",
+    "page": 220,
+    "file": "/figures/fig-6-4.png",
+    "region": {
+      "yTop": 122.86351,
+      "yBottom": 320.07147
+    }
+  },
+  {
+    "label": "6-5",
+    "caption": "Figure 6-5. Partitioning secondary indexes by term.",
+    "page": 221,
+    "file": "/figures/fig-6-5.png",
+    "region": {
+      "yTop": 355.66364,
+      "yBottom": 535.80289
+    }
+  },
+  {
+    "label": "6-6",
+    "caption": "Figure 6-6. Adding a new node to a database cluster with multiple partitions per node.",
+    "page": 225,
+    "file": "/figures/fig-6-6.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 268.02722
+    }
+  },
+  {
+    "label": "6-7",
+    "caption": "Figure 6-7. Three different ways of routing a request to the right node.",
+    "page": 228,
+    "file": "/figures/fig-6-7.png",
+    "region": {
+      "yTop": 91.6635,
+      "yBottom": 282.71155
+    }
+  },
+  {
+    "label": "6-8",
+    "caption": "Figure 6-8. Using ZooKeeper to keep track of assignment of partitions to nodes.",
+    "page": 229,
+    "file": "/figures/fig-6-8.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 232.47318
+    }
+  },
+  {
+    "label": "7-1",
+    "caption": "Figure 7-1. A race condition between two clients concurrently incrementing a counter.",
+    "page": 240,
+    "file": "/figures/fig-7-1.png",
+    "region": {
+      "yTop": 116.86351,
+      "yBottom": 250.10462
+    }
+  },
+  {
+    "label": "7-2",
+    "caption": "Figure 7-2. Violating isolation: one transaction reads another transaction’s uncommit‐ ted writes.",
+    "page": 242,
+    "file": "/figures/fig-7-2.png",
+    "region": {
+      "yTop": 327.46358,
+      "yBottom": 511.26212
+    }
+  },
+  {
+    "label": "7-3",
+    "caption": "Figure 7-3. Atomicity ensures that if an error occurs, any prior writes from that trans‐ action are undone, to avoid an inconsistent state.",
+    "page": 243,
+    "file": "/figures/fig-7-3.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 185.4328
+    }
+  },
+  {
+    "label": "7-4",
+    "caption": "Figure 7-4. No dirty reads: user 2 sees the new value for x only after user 1’s transaction has committed.",
+    "page": 248,
+    "file": "/figures/fig-7-4.png",
+    "region": {
+      "yTop": 264.05005,
+      "yBottom": 413.89115
+    }
+  },
+  {
+    "label": "7-5",
+    "caption": "Figure 7-5. With dirty writes, conflicting writes from different transactions can be mixed up.",
+    "page": 249,
+    "file": "/figures/fig-7-5.png",
+    "region": {
+      "yTop": 238.26354,
+      "yBottom": 444.34998
+    }
+  },
+  {
+    "label": "7-6",
+    "caption": "Figure 7-6. Read skew: Alice observes the database in an inconsistent state.",
+    "page": 251,
+    "file": "/figures/fig-7-6.png",
+    "region": {
+      "yTop": 382.26364,
+      "yBottom": 571.75003
+    }
+  },
+  {
+    "label": "7-7",
+    "caption": "Figure 7-7. Implementing snapshot isolation using multiversion objects.",
+    "page": 253,
+    "file": "/figures/fig-7-7.png",
+    "region": {
+      "yTop": 185.86351,
+      "yBottom": 481.01315
+    }
+  },
+  {
+    "label": "7-8",
+    "caption": "Figure 7-8. Example of write skew causing an application bug.",
+    "page": 260,
+    "file": "/figures/fig-7-8.png",
+    "region": {
+      "yTop": 217.06353,
+      "yBottom": 492.70783
+    }
+  },
+  {
+    "label": "7-9",
+    "caption": "Figure 7-9. The difference between an interactive transaction and a stored procedure (using the example transaction of Figure 7-8).",
+    "page": 267,
+    "file": "/figures/fig-7-9.png",
+    "region": {
+      "yTop": 311.2636,
+      "yBottom": 556.83448
+    }
+  },
+  {
+    "label": "7-10",
+    "caption": "Figure 7-10. Detecting when a transaction reads outdated values from a MVCC snap‐ shot.",
+    "page": 277,
+    "file": "/figures/fig-7-10.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 303.59435
+    }
+  },
+  {
+    "label": "7-11",
+    "caption": "Figure 7-11. In serializable snapshot isolation, detecting when one transaction modifies another transaction’s reads.",
+    "page": 278,
+    "file": "/figures/fig-7-11.png",
+    "region": {
+      "yTop": 116.86351,
+      "yBottom": 377.87751
+    }
+  },
+  {
+    "label": "8-1",
+    "caption": "Figure 8-1. If you send a request and don’t get a response, it’s not possible to distinguish whether (a) the request was lost, (b) the remote node is down, or (c) the response was lost.",
+    "page": 292,
+    "file": "/figures/fig-8-1.png",
+    "region": {
+      "yTop": 323.26356,
+      "yBottom": 493.58878
+    }
+  },
+  {
+    "label": "8-2",
+    "caption": "Figure 8-2. If several machines send network traffic to the same destination, its switch queue can fill up. Here, ports 1, 2 and 4 are all trying to send packets to port 3.",
+    "page": 297,
+    "file": "/figures/fig-8-2.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 223.53414
+    }
+  },
+  {
+    "label": "8-3",
+    "caption": "Figure 8-3. The write by client B is causally later than the write by client A, but B’s write has an earlier timestamp.",
+    "page": 305,
+    "file": "/figures/fig-8-3.png",
+    "region": {
+      "yTop": 271.95557,
+      "yBottom": 476.88678
+    }
+  },
+  {
+    "label": "8-4",
+    "caption": "Figure 8-4. Incorrect implementation of a distributed lock: client 1 believes that it still has a valid lease, even though it has expired, and thus corrupts a file in storage.",
+    "page": 316,
+    "file": "/figures/fig-8-4.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 220.68937
+    }
+  },
+  {
+    "label": "8-5",
+    "caption": "Figure 8-5. Making access to storage safe by allowing writes only in the order of increas‐ ing fencing tokens.",
+    "page": 316,
+    "file": "/figures/fig-8-5.png",
+    "region": {
+      "yTop": 357.18143,
+      "yBottom": 530.00727
+    }
+  },
+  {
+    "label": "9-1",
+    "caption": "Figure 9-1. This system is not linearizable, causing football fans to be confused.",
+    "page": 336,
+    "file": "/figures/fig-9-1.png",
+    "region": {
+      "yTop": 304.7876,
+      "yBottom": 585.71323
+    }
+  },
+  {
+    "label": "9-2",
+    "caption": "Figure 9-2. If a read request is concurrent with a write request, it may return either the old or the new value.",
+    "page": 338,
+    "file": "/figures/fig-9-2.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 193.33884
+    }
+  },
+  {
+    "label": "9-3",
+    "caption": "Figure 9-3. After any one read has returned the new value, all following reads (on the same or other clients) must also return the new value.",
+    "page": 339,
+    "file": "/figures/fig-9-3.png",
+    "region": {
+      "yTop": 110.26351,
+      "yBottom": 255.73887
+    }
+  },
+  {
+    "label": "9-4",
+    "caption": "Figure 9-4. Visualizing the points in time at which the reads and writes appear to have taken effect. The final read by B is not linearizable.",
+    "page": 340,
+    "file": "/figures/fig-9-4.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 260.51627
+    }
+  },
+  {
+    "label": "9-5",
+    "caption": "Figure 9-5. The web server and image resizer communicate both through file storage and a message queue, opening the potential for race conditions.",
+    "page": 344,
+    "file": "/figures/fig-9-5.png",
+    "region": {
+      "yTop": 189.99549,
+      "yBottom": 346.5655
+    }
+  },
+  {
+    "label": "9-6",
+    "caption": "Figure 9-6. A non-linearizable execution, despite using a strict quorum.",
+    "page": 347,
+    "file": "/figures/fig-9-6.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 273.51926
+    }
+  },
+  {
+    "label": "9-7",
+    "caption": "Figure 9-7. A network interruption forcing a choice between linearizability and availa‐ bility.",
+    "page": 348,
+    "file": "/figures/fig-9-7.png",
+    "region": {
+      "yTop": 156.44501,
+      "yBottom": 357.71863
+    }
+  },
+  {
+    "label": "9-8",
+    "caption": "Figure 9-8. Lamport timestamps provide a total ordering consistent with causality.",
+    "page": 358,
+    "file": "/figures/fig-9-8.png",
+    "region": {
+      "yTop": 330.35556,
+      "yBottom": 508.86923
+    }
+  },
+  {
+    "label": "9-9",
+    "caption": "Figure 9-9. A successful execution of two-phase commit (2PC).",
+    "page": 368,
+    "file": "/figures/fig-9-9.png",
+    "region": {
+      "yTop": 389.49554,
+      "yBottom": 539.15506
+    }
+  },
+  {
+    "label": "9-10",
+    "caption": "Figure 9-10. The coordinator crashes after participants vote “yes”. Database 1 does not know whether to commit or abort.",
+    "page": 371,
+    "file": "/figures/fig-9-10.png",
+    "region": {
+      "yTop": 223.66353,
+      "yBottom": 390.39344
+    }
+  },
+  {
+    "label": "10-1",
+    "caption": "Figure 10-1. A MapReduce job with three mappers and three reducers.",
+    "page": 411,
+    "file": "/figures/fig-10-1.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 311.68807
+    }
+  },
+  {
+    "label": "10-2",
+    "caption": "Figure 10-2. A join between a log of user activity events and a database of user profiles.",
+    "page": 414,
+    "file": "/figures/fig-10-2.png",
+    "region": {
+      "yTop": 322.35561,
+      "yBottom": 504.25131
+    }
+  },
+  {
+    "label": "10-3",
+    "caption": "Figure 10-3. A reduce-side sort-merge join on user ID. If the input datasets are parti‐ tioned into multiple files, each could be processed with multiple mappers in parallel.",
+    "page": 415,
+    "file": "/figures/fig-10-3.png",
+    "region": {
+      "yTop": 334.95558,
+      "yBottom": 537.8548
+    }
+  },
+  {
+    "label": "11-1",
+    "caption": "Figure 11-1. (a) Load balancing: sharing the work of consuming a topic among con‐ sumers; (b) fan-out: delivering each message to multiple consumers.",
+    "page": 453,
+    "file": "/figures/fig-11-1.png",
+    "region": {
+      "yTop": 173.2635,
+      "yBottom": 384.69709
+    }
+  },
+  {
+    "label": "11-2",
+    "caption": "Figure 11-2. Consumer 2 crashes while processing m3, so it is redelivered to consumer 1 at a later time.",
+    "page": 454,
+    "file": "/figures/fig-11-2.png",
+    "region": {
+      "yTop": 185.86351,
+      "yBottom": 406.6442
+    }
+  },
+  {
+    "label": "11-3",
+    "caption": "Figure 11-3. Producers send messages by appending them to a topic-partition file, and consumers read these files sequentially.",
+    "page": 456,
+    "file": "/figures/fig-11-3.png",
+    "region": {
+      "yTop": 40,
+      "yBottom": 277.17985
+    }
+  },
+  {
+    "label": "11-4",
+    "caption": "Figure 11-4. In the database, X is first set to A and then to B, while at the search index the writes arrive in the opposite order.",
+    "page": 460,
+    "file": "/figures/fig-11-4.png",
+    "region": {
+      "yTop": 217.06353,
+      "yBottom": 398.83011
+    }
+  },
+  {
+    "label": "11-5",
+    "caption": "Figure 11-5. Taking data in the order it was written to one database, and applying the changes to other systems in the same order.",
+    "page": 461,
+    "file": "/figures/fig-11-5.png",
+    "region": {
+      "yTop": 387.87262,
+      "yBottom": 578.57987
+    }
+  },
+  {
+    "label": "11-6",
+    "caption": "Figure 11-6. The relationship between the current application state and an event stream.",
+    "page": 467,
+    "file": "/figures/fig-11-6.png",
+    "region": {
+      "yTop": 79.0635,
+      "yBottom": 187.67864
+    }
+  },
+  {
+    "label": "11-7",
+    "caption": "Figure 11-7. Windowing by processing time introduces artifacts due to variations in processing rate.",
+    "page": 476,
+    "file": "/figures/fig-11-7.png",
+    "region": {
+      "yTop": 79.0635,
+      "yBottom": 319.35126
+    }
+  }
+]

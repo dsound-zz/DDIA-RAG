@@ -76,6 +76,53 @@ DDIA-RAG is a Retrieval-Augmented Generation study companion for the book *Desig
 17. **Dead scripts:** `ingest.ts` (superseded), `test-llamaparse.ts`, `inspect-llamaparse.ts`, `test-query.ts` should be cleaned up.
 18. **491 page images (~170MB) in `public/diagrams/`:** Many are blank pages. Should not be in git.
 
+## Update (2026-06-12): Figures, full text, and layout overhaul
+
+### New content pipeline (PDF-derived, no API costs)
+The Neon RAG chunks only cover text whose headings fuzzy-matched during
+LlamaParse ingestion (e.g. "fencing tokens" appears in zero chunks), so
+reading content is now extracted deterministically from the PDF:
+
+- `npm run extract:figures` (`scripts/extract-figures.mjs`) — crops all 88
+  vector figures via `pdftotext -bbox-layout` caption detection +
+  `pdftoppm` region rendering → `public/figures/fig-X-Y.png` +
+  `scripts/figures-manifest.json`. Requires poppler (`brew install poppler`).
+- `npm run extract:content` (`scripts/extract-section-content.ts`) — locates
+  every TOC title as a PDF heading (fuzzy sequence matching), slices the book
+  into per-section ranges, and writes `data/section-content.json`
+  (sectionId → full reading text with inline figure tokens + figure list).
+  175/192 sections matched; the 17 unmatched are chapter 12 + its children,
+  which do not exist in this early-release PDF (it ends at chapter 11).
+- `src/lib/section-content.ts` serves that artifact to the API routes.
+  Neon keeps RAG/chat duties; reading content is file-based.
+
+### API changes
+- `GET /api/toc/[id]/content` now returns `figures` + `hasText` for the
+  section and each child.
+- `GET /api/toc/[id]/text` serves the PDF-extracted text (fallback to chunks).
+
+### UI changes (`src/app/page.tsx`)
+- Sidebar: parts as group headers (Part I/II/III), numbered chapters,
+  indent rails, chapters/sections collapsed by default, auto-expand of the
+  active path, wrapping titles.
+- Content pane: "Diagrams from the book" panel below Key Concepts; figure
+  thumbnails + diagram-count badges on child cards; click-to-zoom lightbox
+  (Escape closes); "Read the book text" expander on the section and each
+  child card — serif reading view with figures rendered inline.
+- `globals.css`: body was rendering in Arial (Geist was loaded but
+  overridden) — fixed; removed the half-implemented dark-mode override;
+  added `.prose-book` reading typography.
+
+### Known data caveats
+- Chapter 12 + Glossary have TOC entries and LLM summaries but no source
+  text in this PDF (early release). Their summaries are hallucination-prone.
+  The UI dims these 17 sections in the sidebar ("final ed." badge) and
+  shows an amber warning banner in the content pane.
+- RAG chunk coverage was thin (948 chunks, 322K chars). Run
+  `npm run db:rechunk` (script: `scripts/rechunk-from-content.ts`) to
+  replace the LlamaParse-derived chunks with paragraph-boundary chunks
+  from `data/section-content.json`, bringing coverage to ~100%.
+
 ## Architecture
 
 ### Data Pipeline
@@ -135,3 +182,12 @@ npx tsx scripts/test-query.ts
 - `DATABASE_URL` — Neon Postgres connection string
 - `TOGETHER_API_KEY` — Together AI API key
 - `LLAMA_CLOUD_API_KEY` — LlamaParse API key
+- `AUTH_SECRET` — Random secret for NextAuth sessions (run `npx auth secret` to generate)
+- `AUTH_RESEND_KEY` — Resend API key for magic-link emails (free at resend.com)
+
+### First-time auth setup
+1. Add `AUTH_SECRET` and `AUTH_RESEND_KEY` to `.env`
+2. Run `npm run db:push` to create the auth tables (user, account, session, verificationToken)
+   and add the `user_id` column to `saved_artifacts`
+3. In production, update `AUTH_RESEND_KEY`'s sender domain from `onboarding@resend.dev`
+   to a verified domain in `src/auth.ts`

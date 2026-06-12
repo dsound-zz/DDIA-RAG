@@ -12,15 +12,22 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* The app is a light-themed reading surface end to end; an OS-driven dark
+   background here would fight the hardcoded light panes. */
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* Book reading text */
+.prose-book {
+  font-family: Charter, Georgia, Cambria, "Times New Roman", serif;
+  font-size: 15px;
+  line-height: 1.75;
+  color: #374151;
+}
+.prose-book p + p {
+  margin-top: 0.9em;
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db/index";
 import { structuralMetadata, textChunks } from "@/db/schema";
 import { eq, asc, sql } from "drizzle-orm";
+import { getSectionContent } from "@/lib/section-content";
 
 export async function GET(
   request: Request,
@@ -59,10 +60,13 @@ export async function GET(
             .orderBy(asc(textChunks.orderIndex));
         }
 
+        const childContent = getSectionContent(child.id);
         return {
           ...child,
           chunkCount,
           chunks,
+          figures: childContent?.figures ?? [],
+          hasText: (childContent?.text.length ?? 0) > 0,
         };
       })
     );
@@ -79,10 +83,14 @@ export async function GET(
       .where(eq(textChunks.sectionId, id))
       .orderBy(asc(textChunks.orderIndex));
 
+    const sectionContent = getSectionContent(id);
+
     return NextResponse.json({
       section,
       children: childrenWithMetadata,
       chunks: sectionChunks,
+      figures: sectionContent?.figures ?? [],
+      hasText: (sectionContent?.text.length ?? 0) > 0,
     });
   } catch (error) {
     console.error("Error fetching content:", error);

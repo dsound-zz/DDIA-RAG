@@ -1,5 +1,6 @@
-import { pgTable, text, varchar, timestamp, integer, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, uuid, primaryKey } from "drizzle-orm/pg-core";
 import { vector } from "drizzle-orm/pg-core";
+import type { AdapterAccountType } from "next-auth/adapters";
 
 // Table to track books/documents
 export const books = pgTable("books", {
@@ -34,12 +35,62 @@ export const textChunks = pgTable("text_chunks", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// Saved artifacts — bookmarked chat responses and user notes
+// ─── Auth tables (NextAuth / Auth.js Drizzle adapter) ─────────────────────────
+
+export const users = pgTable("user", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: text("name"),
+  email: text("email").unique(),
+  emailVerified: timestamp("emailVerified", { mode: "date" }),
+  image: text("image"),
+});
+
+export const accounts = pgTable(
+  "account",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").$type<AdapterAccountType>().notNull(),
+    provider: text("provider").notNull(),
+    providerAccountId: text("providerAccountId").notNull(),
+    refresh_token: text("refresh_token"),
+    access_token: text("access_token"),
+    expires_at: integer("expires_at"),
+    token_type: text("token_type"),
+    scope: text("scope"),
+    id_token: text("id_token"),
+    session_state: text("session_state"),
+  },
+  (account) => [primaryKey({ columns: [account.provider, account.providerAccountId] })],
+);
+
+export const sessions = pgTable("session", {
+  sessionToken: text("sessionToken").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  expires: timestamp("expires", { mode: "date" }).notNull(),
+});
+
+export const verificationTokens = pgTable(
+  "verificationToken",
+  {
+    identifier: text("identifier").notNull(),
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+  },
+  (vt) => [primaryKey({ columns: [vt.identifier, vt.token] })],
+);
+
+// ─── Saved artifacts ──────────────────────────────────────────────────────────
+
 export const savedArtifacts = pgTable("saved_artifacts", {
   id: uuid("id").defaultRandom().primaryKey(),
+  userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
   sectionId: uuid("section_id").references(() => structuralMetadata.id, { onDelete: "set null" }),
   title: varchar("title", { length: 500 }).notNull(),
   content: text("content").notNull(),
-  artifactType: varchar("artifact_type", { length: 50 }).notNull().default("chat_response"), // "chat_response" | "note"
+  artifactType: varchar("artifact_type", { length: 50 }).notNull().default("chat_response"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

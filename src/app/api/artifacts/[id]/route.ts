@@ -1,18 +1,23 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { db } from "@/db/index";
 import { savedArtifacts } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
   try {
     const { id } = await params;
 
     const [deleted] = await db
       .delete(savedArtifacts)
-      .where(eq(savedArtifacts.id, id))
+      .where(and(eq(savedArtifacts.id, id), eq(savedArtifacts.userId, session.user.id)))
       .returning();
 
     if (!deleted) {
