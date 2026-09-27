@@ -7,14 +7,16 @@ import { LlamaParseReader } from "llama-cloud-services";
 import Together from "together-ai";
 import { db } from "../src/db/index";
 import { structuralMetadata, textChunks } from "../src/db/schema";
+import { embedTexts } from "../src/lib/embeddings";
 
 // ---------------------------------------------------------------------------
 // Configuration
 // ---------------------------------------------------------------------------
 
 const TOGETHER_MODEL = "meta-llama/Llama-3.3-70B-Instruct-Turbo";
-const EMBEDDING_MODEL = "intfloat/multilingual-e5-large-instruct";
-const EMBEDDING_BATCH_SIZE = 10; // Together AI limit
+// Embeddings moved off Together AI (see src/lib/embeddings.ts) — it no longer
+// offers any embedding models on serverless.
+const EMBEDDING_BATCH_SIZE = 96; // OpenAI's embeddings endpoint allows much larger batches than Together's old limit of 10
 const JACCARD_MATCH_THRESHOLD = 0.3;
 const MAX_PARAGRAPH_CHARS = 2000;
 
@@ -332,14 +334,8 @@ async function generateEmbeddingsInBatches(
     const batchEnd = Math.min(batchStart + EMBEDDING_BATCH_SIZE, textChunkContents.length);
     const batch = textChunkContents.slice(batchStart, batchEnd);
 
-    const embeddingsResponse = await together.embeddings.create({
-      model: EMBEDDING_MODEL,
-      input: batch,
-    });
-
-    for (const embeddingData of embeddingsResponse.data) {
-      allEmbeddings.push(embeddingData.embedding);
-    }
+    const batchEmbeddings = await embedTexts(batch);
+    allEmbeddings.push(...batchEmbeddings);
   }
 
   return allEmbeddings;

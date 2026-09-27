@@ -1,6 +1,7 @@
 /**
  * Re-chunks the DDIA text from data/section-content.json and re-embeds
- * everything with Together AI, replacing the sparse LlamaParse-derived chunks.
+ * everything (via OpenAI — see src/lib/embeddings.ts), replacing the sparse
+ * LlamaParse-derived chunks.
  *
  * The old chunks covered ~30% of the book (322K of 1,068K chars) because
  * LlamaParse ingestion dropped sections whose headings didn't fuzzy-match.
@@ -13,7 +14,7 @@
  * What it does:
  *   1. Reads data/section-content.json
  *   2. Splits each section's text into ~800-char paragraph-boundary chunks
- *   3. Embeds in batches of 8 via Together AI
+ *   3. Embeds in batches via OpenAI's text-embedding-3-small
  *   4. Deletes old chunks for each section, inserts new ones
  */
 
@@ -22,18 +23,17 @@ dotenv.config({ path: ".env" });
 
 import fs from "fs";
 import path from "path";
-import Together from "together-ai";
 import { eq } from "drizzle-orm";
 import { db } from "../src/db/index";
 import { textChunks } from "../src/db/schema";
+import { embedTexts } from "../src/lib/embeddings";
 
-const EMBEDDING_MODEL = "intfloat/multilingual-e5-large-instruct";
+// Embeddings moved off Together AI (see src/lib/embeddings.ts) — it no longer
+// offers any embedding models on serverless.
 const CHUNK_TARGET = 800;   // target chars per chunk
-const EMBED_BATCH = 8;      // Together AI batch limit
+const EMBED_BATCH = 96;     // OpenAI's embeddings endpoint allows much larger batches than Together's old limit of 8
 
 const FIGURE_TOKEN = /^!\[/;  // skip inline figure markers in book text
-
-const together = new Together({ apiKey: process.env.TOGETHER_API_KEY });
 
 function splitIntoChunks(text: string): string[] {
   const paragraphs = text.split(/\n\n+/).map(p => p.trim()).filter(p => p.length > 0 && !FIGURE_TOKEN.test(p));
@@ -55,11 +55,7 @@ function splitIntoChunks(text: string): string[] {
 }
 
 async function embedBatch(texts: string[]): Promise<number[][]> {
-  const response = await together.embeddings.create({
-    model: EMBEDDING_MODEL,
-    input: texts,
-  });
-  return response.data.map(d => d.embedding);
+  return embedTexts(texts);
 }
 
 async function main() {

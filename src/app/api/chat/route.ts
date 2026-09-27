@@ -2,14 +2,10 @@ import { NextResponse } from "next/server";
 import { ChatTogetherAI } from "@langchain/community/chat_models/togetherai";
 import { StateGraph, START, END, Annotation } from "@langchain/langgraph";
 import { BaseMessage, HumanMessage, SystemMessage } from "@langchain/core/messages";
-import Together from "together-ai";
 import { db } from "@/db/index";
 import { textChunks, structuralMetadata } from "@/db/schema";
 import { cosineDistance, desc, sql, eq, inArray } from "drizzle-orm";
-
-const together = new Together({
-  apiKey: process.env.TOGETHER_API_KEY,
-});
+import { embedTexts } from "@/lib/embeddings";
 
 const llm = new ChatTogetherAI({
   model: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
@@ -67,11 +63,7 @@ async function retrieveNode(state: typeof StateAnnotation.State) {
   const activeSectionId = state.sectionId;
 
   // 1. Embed the query
-  const embeddingsResponse = await together.embeddings.create({
-    model: "intfloat/multilingual-e5-large-instruct",
-    input: [queryText],
-  });
-  const queryVector = embeddingsResponse.data[0].embedding;
+  const [queryVector] = await embedTexts([queryText]);
 
   // 2. Search Neon DB — scoped to section if provided, otherwise global
   const similarity = sql<number>`1 - (${cosineDistance(textChunks.embedding, queryVector)})`;

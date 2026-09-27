@@ -1,19 +1,13 @@
 import { db } from "../src/db/index";
 import { textChunks } from "../src/db/schema";
 import { cosineDistance, desc, sql } from "drizzle-orm";
-import Together from "together-ai";
+import { embedTexts } from "../src/lib/embeddings";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-const together = new Together();
-
 async function main() {
   const query = "What is the difference between synchronous and asynchronous replication?";
-  const embeddingsResponse = await together.embeddings.create({
-    model: "intfloat/multilingual-e5-large-instruct",
-    input: [query],
-  });
-  const vector = embeddingsResponse.data[0].embedding;
+  const [vector] = await embedTexts([query]);
 
   const similarity = sql<number>`1 - (${cosineDistance(textChunks.embedding, vector)})`;
   const results = await db

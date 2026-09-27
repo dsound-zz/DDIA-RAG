@@ -30,7 +30,9 @@ export const textChunks = pgTable("text_chunks", {
   content: text("content").notNull(),
   orderIndex: integer("order_index").notNull().default(0),
   imageUrl: varchar("image_url", { length: 500 }),
-  // intfloat/multilingual-e5-large-instruct via Together AI (1024 dimensions)
+  // OpenAI text-embedding-3-small, truncated to 1024 dims via the API's
+  // `dimensions` param (see src/lib/embeddings.ts) — was e5-large-instruct
+  // via Together AI until Together discontinued serverless embeddings.
   embedding: vector("embedding", { dimensions: 1024 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
